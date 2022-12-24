@@ -1,0 +1,59 @@
+@use "vars/colors";
+
+:root {
+	color: hsl(207deg, 100%, 93%);
+	font-family: 'Orienta', sans-serif;
+}
+
+#root {
+	display: grid;
+	place-items: center;
+}
+
+input, button {
+	background-color: colors.$input-bg; 
+	border: 2px solid colors.$border;
+	appearance: textfield;
+	border-radius: 0.75rem;
+	padding-right: 0.5rem;
+	padding-left: 0.5rem;
+	padding-top: 0.25rem;
+	padding-bottom: 0.25rem;
+	color: inherit;
+
+	&:focus {
+		background-color: colors.$focus;
+	}
+
+	&:hover:not(:focus) {
+		background-color: colors.$hover;
+	}
+
+	&:active {
+		background-color: colors.$active;
+	}
+
+}
+
+input[type="number"] {
+	width: 2ch;
+	text-align: right;
+}
+
+body, html, #root {
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	background-color: colors.$site-bg;
+}
+
+.App {
+	width: 55%;
+	height: 60%;
+	background-color: colors.$panel-bg;
+	border: 2px solid colors.$border;
+	border-radius: 1rem;
+	padding: 1.5rem;
+}

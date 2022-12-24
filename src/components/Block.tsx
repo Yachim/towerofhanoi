@@ -7,12 +7,13 @@ export default function Block(props: BlockProps) {
 	const blocksCnt = useContext(BlocksCntContext);
 	const hue = useMemo(() => {
 		return (360 / blocksCnt) * props.size;
-	}, []);
+	}, [blocksCnt]);
 
 	return (
 		<div
 			className={style.block}
 			style={{"--hue": hue.toString()} as CSSProperties}
+			draggable={true}
 		></div>
-	)
+	);
 }

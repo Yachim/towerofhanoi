@@ -8,5 +8,5 @@ export default function Tower(props: TowerProps) {
 				<Block key={i} {...block}/>
 			)}
 		</div>
-	)
+	);
 }
