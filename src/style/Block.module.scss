@@ -1,0 +1,5 @@
+.block {
+	background-color: hsl(var(--hue), 85%, 75%);
+	height: clamp(0px, 100%, 25px);
+	width: var(--width); /* is this better than inline styling? */
+}

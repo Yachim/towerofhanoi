@@ -1,7 +1,11 @@
 @use "vars/colors";
 
+* {
+	box-sizing: border-box;
+}
+
 :root {
-	color: hsl(207deg, 100%, 93%);
+	color: colors.$text; 
 	font-family: 'Orienta', sans-serif;
 }
 
@@ -20,19 +24,27 @@ input, button {
 	padding-top: 0.25rem;
 	padding-bottom: 0.25rem;
 	color: inherit;
+	font-family: inherit;
+	box-sizing: content-box;
 
-	&:focus {
+	&:focus-visible {
+		outline: none;
+		transition: background-color 200ms ease-in-out;
 		background-color: colors.$focus;
 	}
 
 	&:hover:not(:focus) {
+		transition: background-color 200ms ease-in-out;
 		background-color: colors.$hover;
 	}
 
-	&:active {
+	&:active:not(input) {
 		background-color: colors.$active;
 	}
+}
 
+button {
+	cursor: pointer;
 }
 
 input[type="number"] {
@@ -56,4 +68,8 @@ body {
 	border: 2px solid colors.$border;
 	border-radius: 1rem;
 	padding: 1.5rem;
+
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
 }
