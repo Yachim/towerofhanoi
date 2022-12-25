@@ -6,6 +6,7 @@ import style from "./style/App.module.scss";;
 
 const defaultBlocksCnt = 3;
 const maxBlocksCnt = 20;
+const minBlocksCnt = 3;
 export const BlocksCntContext = createContext(defaultBlocksCnt);
 
 function App() {
@@ -37,7 +38,7 @@ function App() {
 		}
 
 		let newCnt = +(cntEl.current.value);
-		newCnt = Math.min(Math.max(1, newCnt), maxBlocksCnt);
+		newCnt = Math.min(Math.max(minBlocksCnt, newCnt), maxBlocksCnt);
 		cntEl.current.value = newCnt.toString();
 
 		let blocks = [];
