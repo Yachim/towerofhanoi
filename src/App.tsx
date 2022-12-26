@@ -1,4 +1,4 @@
-import { createContext, useEffect, useRef, useState } from 'react'
+import { createContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Tower } from './components';
 import { Tower as TowerProps } from './types';
 import "./style/App.global.scss";
@@ -80,6 +80,8 @@ function App() {
 					<button onClick={restart}>Apply and restart</button>
 					<button>Restart</button>
 					<button>Hint</button>
+					<button>Undo</button>
+					<button>Redo</button>
 					<button>Solve</button>
 				</div>
 
