@@ -88,23 +88,23 @@ function App() {
 			return;
 		}
 
-		const available = [0, 1, 2];
+		let available = [0, 1, 2];
 		// remove active tower
 		available.splice(activeTower, 1);
 
-		available.forEach((availableIndex, i) => {
+		available = available.filter((availableIndex, i) => {
 			const tower = towers[availableIndex];
 			
 			// if tower does not contain blocks => skip
-			if (tower.blocks.length === 0) return;
+			if (tower.blocks.length === 0) return true;
 
-			const activeTowerTopBlock = towers[activeTower].blocks[0];
-			const towerTopBlock = tower.blocks[0];
+			const activeTowerTopBlockSize = towers[activeTower].blocks[0].size;
+			const towerTopBlockSize = tower.blocks[0].size;
 			// if tower's top block's size is bigger than active's top block's size => valid => skip
-			if (towerTopBlock.size > activeTowerTopBlock.size) return;
+			if (towerTopBlockSize > activeTowerTopBlockSize) return true;
 
 			// if checks fail => invalid => remove from available towers
-			available.splice(i, 1);
+			return false;
 		})
 
 		setAvailableTowers(available);
