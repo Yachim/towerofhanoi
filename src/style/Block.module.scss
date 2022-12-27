@@ -2,7 +2,7 @@
 
 .block {
 	background-color: hsl(var(--hue), 85%, 75%);
-	height: var(--height);
+	height: clamp(0px, 100%, 25px);
 	width: var(--width); /* is this better than inline styling? */
 	transition: box-shadow 150ms ease-in-out;
 
