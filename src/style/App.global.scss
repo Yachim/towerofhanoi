@@ -62,7 +62,7 @@ body {
 }
 
 .App {
-	width: 55%;
+	width: 95%;
 	height: 60%;
 	background-color: colors.$panel-bg;
 	border: 2px solid colors.$border;
@@ -72,4 +72,20 @@ body {
 	display: flex;
 	flex-direction: column;
 	gap: 1.5rem;
+
+	@media (min-width: 640px) {
+		width: 85%;
+	}
+
+	@media (min-width: 768px) {
+		width: 75%;
+	}
+
+	@media (min-width: 1024px) {
+		width: 65%;
+	}
+
+	@media (min-width: 1280px) {
+		width: 55%;
+	}
 }

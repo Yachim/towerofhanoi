@@ -9,30 +9,28 @@ const maxBlocksCnt = 20;
 const minBlocksCnt = 3;
 export const BlocksCntContext = createContext(defaultBlocksCnt);
 
-const defaultTowers: TowerProps[] = [
-	{
-		blocks: [
-			{size: 1},
-			{size: 2},
-			{size: 3}
-		],
-		pos: 0
-	},
-	{
-		blocks: [],
-		pos: 1
-	},
-	{
-		blocks: [],
-		pos: 2
-	}
-];
-
 function App() {
 	const [blocksCnt, setBlocksCnt] = useState(defaultBlocksCnt);
 	const cntEl = useRef<HTMLInputElement>(null);
 
-	const [towers, setTowers] = useState<TowerProps[]>(defaultTowers);
+	const [towers, setTowers] = useState<TowerProps[]>([
+		{
+			blocks: [
+				{size: 1},
+				{size: 2},
+				{size: 3}
+			],
+			pos: 0
+		},
+		{
+			blocks: [],
+			pos: 1
+		},
+		{
+			blocks: [],
+			pos: 2
+		}
+	]);
 
 	function applyAndRestart() {
 		if (!cntEl.current) return;
@@ -52,14 +50,27 @@ function App() {
 	useEffect(restart, [blocksCnt]);
 
 	function restart() {
-		let blocks = [];
+		const blocks = [];
 		for (let i = 1; i <= blocksCnt; i++) {
 			blocks.push({
 				size: i
 			});
 		}
 
-		setTowers(defaultTowers);
+		setTowers([
+			{
+				blocks: blocks,
+				pos: 0
+			},
+			{
+				blocks: [],
+				pos: 1
+			},
+			{
+				blocks: [],
+				pos: 2
+			}
+		]);
 	}
 
 	const [activeTower, setActiveTower] = useState<number | null>(null);
@@ -72,7 +83,7 @@ function App() {
 			return;
 		}
 
-		let available = [0, 1, 2];
+		const available = [0, 1, 2];
 		// remove active tower
 		available.splice(activeTower, 1);
 
@@ -85,7 +96,7 @@ function App() {
 			const activeTowerTopBlock = towers[activeTower].blocks[0];
 			const towerTopBlock = tower.blocks[0];
 			// if tower's top block's size is bigger than active's top block's size => valid => skip
-			if (towerTopBlock > activeTowerTopBlock) return;
+			if (towerTopBlock.size > activeTowerTopBlock.size) return;
 
 			// if checks fail => invalid => remove from available towers
 			available.splice(i, 1);
@@ -95,6 +106,24 @@ function App() {
 	}, [activeTower]);
 
 	const [moveCnt, setMoveCnt] = useState(0);
+
+	function moveBlock(targetIndex: number) {
+		console.log("fff");
+		const tower = towers[activeTower!];
+		const targetTower = towers[targetIndex];
+
+		const block = tower.blocks[0];
+		tower.blocks.splice(0, 1);
+
+		targetTower.blocks = [
+			block,
+			...targetTower.blocks
+		];
+
+		setTowers(towers);
+		setMoveCnt((prev) => prev + 1);
+		setActiveTower(null);
+	}
 
   	return (
 		<div className="App">
@@ -127,10 +156,15 @@ function App() {
 				<main className={style["game-area"]}>
 					{towers.map((tower, i) => (
 						<Tower 
+							key={i}
 							{...tower} 
 							available={availableTowers.includes(i)} 
 							selected={activeTower === i}
 							setSelected={setActiveTower}
+							noneSelected={activeTower === null}
+							moveBlockHere={() => {
+								moveBlock(i);
+							}}
 						/>
 					))}
 				</main>

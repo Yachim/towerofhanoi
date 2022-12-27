@@ -10,16 +10,14 @@ export default function Block(props: BlockProps & {
 	selected: boolean;
 }) {
 	const blocksCnt = useContext(BlocksCntContext);
-	const [hue, width] = useMemo(() => {
-		const hue = (360 / blocksCnt) * props.size;
 
-		const width = props.size / (blocksCnt + 1) * width_range + width_rem; // + 1 so it won't be 100%
+	const hue = useMemo(() => (
+		(360 / blocksCnt) * props.size
+	), [blocksCnt, props.size]);
 
-		return [
-			hue,
-			width
-		];
-	}, [blocksCnt]);
+	const width = useMemo(() => (
+		props.size / (blocksCnt + 1) * width_range + width_rem
+	), [blocksCnt, props.size]);
 
 	return (
 		<div
