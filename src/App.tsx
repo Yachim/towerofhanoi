@@ -140,6 +140,15 @@ function App() {
 		checkWon();
 	}
 
+	const minimumMoves = useMemo(() => {
+		let sum = 0;
+		for (let i = 1; i <= blocksCnt; i++) {
+			sum *= 2;
+			sum += 1;
+		}
+		return sum;
+	}, [blocksCnt]);
+
   	return (
 		<div className="App">
 			<div className={style["inputs-wrapper"]}>
@@ -162,7 +171,7 @@ function App() {
 				</div>
 
 				<div className={style.inputs}>
-					<p>Moves: {moveCnt}</p>
+					<p>Moves: {moveCnt} (minumum: {minimumMoves})</p>
 					<button>Show all</button>
 				</div>
 			</div>
