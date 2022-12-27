@@ -14,6 +14,15 @@ export default function Tower(props: TowerProps & {
 }) {
 	const won = useContext(WonContext);
 
+	const containerEl = useRef<HTMLDivElement>(null);
+	const baseEl = useRef<HTMLDivElement>(null);
+
+	const [height, setHeight] = useState(0);
+
+	useEffect(() => {
+		setHeight(containerEl.current!.clientHeight - baseEl.current!.clientHeight);
+	}, [])
+
 	return (
 		<div 
 			className={`
@@ -53,15 +62,20 @@ export default function Tower(props: TowerProps & {
 					${props.available ? style["tower--available"] : ""}
 				`}
 			></div>
-			<div className={style.blocks}>
+			<div 
+				className={style.blocks}
+				ref={containerEl}
+			>
 				{props.blocks.map((block: BlockProps, i: number) => 
 					<Block 
 						key={i} 
 						{...block} 
 						selected={props.selected && i === 0}
+						containerHeight={height}
 					/>
 				)}
 				<div 
+					ref={baseEl}
 					className={`
 						${style.base} 
 						${props.available ? style["tower--available"] : ""}
