@@ -3,6 +3,7 @@ import { Block } from ".";
 import style from "../style/Tower.module.scss";
 import { Dispatch, SetStateAction, useContext, useMemo } from "react";
 import { WonContext } from "../App";
+import { Block as BlockProps } from "../types";
 
 export default function Tower(props: TowerProps & {
 	available: boolean;
@@ -53,7 +54,7 @@ export default function Tower(props: TowerProps & {
 				`}
 			></div>
 			<div className={style.blocks}>
-				{props.blocks.map((block, i) => 
+				{props.blocks.map((block: BlockProps, i: number) => 
 					<Block 
 						key={i} 
 						{...block} 
