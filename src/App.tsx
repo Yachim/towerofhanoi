@@ -76,6 +76,7 @@ function App() {
 		setActiveTower(null);
 		setAvailableTowers([]);
 		setIsWon(false);
+		setMoveCnt(0);
 	}
 
 	const [activeTower, setActiveTower] = useState<number | null>(null);
@@ -172,7 +173,7 @@ function App() {
 						${style["game-area"]}
 						${isWon ? style["game-area--won"] : ""}
 					`}>
-						{!isWon ? towers.map((tower, i) => (
+						{towers.map((tower, i) => (
 							<Tower 
 								key={i}
 								{...tower} 
@@ -184,10 +185,11 @@ function App() {
 									moveBlock(i);
 								}}
 							/>
-						)) :
-							<p className={style["gg-text"]}>GG!</p>
-						}
+						))}
 					</main>
+					{isWon && 
+						<p className={style["gg-text"]}>GG!</p>
+					}
 				</WonContext.Provider>
 			</BlocksCntContext.Provider>
     	</div>

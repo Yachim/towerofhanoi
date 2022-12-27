@@ -1,7 +1,7 @@
 import { Tower as TowerProps } from "../types";
 import { Block } from ".";
 import style from "../style/Tower.module.scss";
-import { Dispatch, SetStateAction, useContext, useMemo } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { WonContext } from "../App";
 import { Block as BlockProps } from "../types";
 
