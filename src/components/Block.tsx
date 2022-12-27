@@ -6,7 +6,9 @@ import style from "../style/Block.module.scss";
 const width_range = 80; // at least 20%
 const width_rem = 100 - width_range;
 
-export default function Block(props: BlockProps) {
+export default function Block(props: BlockProps & {
+	selected: boolean;
+}) {
 	const blocksCnt = useContext(BlocksCntContext);
 	const [hue, width] = useMemo(() => {
 		const hue = (360 / blocksCnt) * props.size;
@@ -19,16 +21,16 @@ export default function Block(props: BlockProps) {
 		];
 	}, [blocksCnt]);
 
-	console.log(width);
-
 	return (
 		<div
-			className={style.block}
+			className={`
+				${style.block} 
+				${props.selected ? style["block--selected"] : ""}
+			`}
 			style={{
 				"--hue": hue,
 				"--width": `${width}%`
 			} as CSSProperties}
-			draggable={true}
 		></div>
 	);
 }

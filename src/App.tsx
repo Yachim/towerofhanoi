@@ -9,28 +9,32 @@ const maxBlocksCnt = 20;
 const minBlocksCnt = 3;
 export const BlocksCntContext = createContext(defaultBlocksCnt);
 
-function App() {
-	const [blocksCnt, setBlocksCnt] = useState(defaultBlocksCnt);
-	const cntEl = useRef<HTMLInputElement>(null);
-
-	const [tower1, setTower1] = useState<TowerProps>({
+const defaultTowers: TowerProps[] = [
+	{
 		blocks: [
 			{size: 1},
 			{size: 2},
 			{size: 3}
 		],
+		pos: 0
+	},
+	{
+		blocks: [],
 		pos: 1
-	});
-	const [tower2, setTower2] = useState<TowerProps>({
+	},
+	{
 		blocks: [],
 		pos: 2
-	});
-	const [tower3, setTower3] = useState<TowerProps>({
-		blocks: [],
-		pos: 3
-	});
+	}
+];
 
-	function restart() {
+function App() {
+	const [blocksCnt, setBlocksCnt] = useState(defaultBlocksCnt);
+	const cntEl = useRef<HTMLInputElement>(null);
+
+	const [towers, setTowers] = useState<TowerProps[]>(defaultTowers);
+
+	function applyAndRestart() {
 		if (!cntEl.current) return;
 		if (isNaN(cntEl.current.value as any)) {
 			cntEl.current.value = defaultBlocksCnt.toString();
@@ -41,28 +45,56 @@ function App() {
 		newCnt = Math.min(Math.max(minBlocksCnt, newCnt), maxBlocksCnt);
 		cntEl.current.value = newCnt.toString();
 
+		setBlocksCnt(newCnt);
+	}
+
+	// restart after modifying blocksCnt
+	useEffect(restart, [blocksCnt]);
+
+	function restart() {
 		let blocks = [];
-		for (let i = 1; i <= newCnt; i++) {
+		for (let i = 1; i <= blocksCnt; i++) {
 			blocks.push({
 				size: i
 			});
 		}
 
-		setTower1({
-			blocks: blocks,
-			pos: 1
-		});
-		setTower2({
-			blocks: [],
-			pos: 2
-		});
-		setTower3({
-			blocks: [],
-			pos: 3
-		});
-
-		setBlocksCnt(newCnt);
+		setTowers(defaultTowers);
 	}
+
+	const [activeTower, setActiveTower] = useState<number | null>(null);
+	const [availableTowers, setAvailableTowers] = useState<number[]>([]);
+
+	useEffect(() => {
+		// if none selected
+		if (activeTower === null) {
+			setAvailableTowers([]);
+			return;
+		}
+
+		let available = [0, 1, 2];
+		// remove active tower
+		available.splice(activeTower, 1);
+
+		available.forEach((availableIndex, i) => {
+			const tower = towers[availableIndex];
+			
+			// if tower does not contain blocks => skip
+			if (tower.blocks.length === 0) return;
+
+			const activeTowerTopBlock = towers[activeTower].blocks[0];
+			const towerTopBlock = tower.blocks[0];
+			// if tower's top block's size is bigger than active's top block's size => valid => skip
+			if (towerTopBlock > activeTowerTopBlock) return;
+
+			// if checks fail => invalid => remove from available towers
+			available.splice(i, 1);
+		})
+
+		setAvailableTowers(available);
+	}, [activeTower]);
+
+	const [moveCnt, setMoveCnt] = useState(0);
 
   	return (
 		<div className="App">
@@ -74,11 +106,11 @@ function App() {
 						type="number" 
 						ref={cntEl} 
 						defaultValue={defaultBlocksCnt}
-						min={1}
+						min={minBlocksCnt}
 						max={maxBlocksCnt}
 					/>
-					<button onClick={restart}>Apply and restart</button>
-					<button>Restart</button>
+					<button onClick={applyAndRestart}>Apply and restart</button>
+					<button onClick={restart}>Restart</button>
 					<button>Hint</button>
 					<button>Undo</button>
 					<button>Redo</button>
@@ -86,16 +118,21 @@ function App() {
 				</div>
 
 				<div className={style.inputs}>
-					<p>Moves: {123}</p>
+					<p>Moves: {moveCnt}</p>
 					<button>Show all</button>
 				</div>
 			</div>
 
 			<BlocksCntContext.Provider value={blocksCnt}>
 				<main className={style["game-area"]}>
-					<Tower {...tower1}/>
-					<Tower {...tower2}/>
-					<Tower {...tower3}/>
+					{towers.map((tower, i) => (
+						<Tower 
+							{...tower} 
+							available={availableTowers.includes(i)} 
+							selected={activeTower === i}
+							setSelected={setActiveTower}
+						/>
+					))}
 				</main>
 			</BlocksCntContext.Provider>
     	</div>
