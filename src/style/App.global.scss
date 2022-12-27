@@ -17,7 +17,6 @@
 input, button {
 	background-color: colors.$input-bg; 
 	border: 2px solid colors.$border;
-	appearance: textfield;
 	border-radius: 0.75rem;
 	padding-right: 0.5rem;
 	padding-left: 0.5rem;
@@ -41,6 +40,16 @@ input, button {
 	&:active:not(input) {
 		background-color: colors.$active;
 	}
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 button {
