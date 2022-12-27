@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Tower } from './components';
 import { Tower as TowerProps } from './types';
 import "./style/App.global.scss";
@@ -148,6 +148,34 @@ function App() {
 		}
 		return sum;
 	}, [blocksCnt]);
+
+	const handleKeyPress = useCallback((e: KeyboardEvent) => {
+		if (isWon) return;
+
+		if (!["1", "2", "3"].includes(e.key)) return;
+		const key = +e.key;
+
+		if (activeTower === null) {
+			if (towers[key - 1].blocks.length === 0) return;
+			setActiveTower(key - 1);
+		}
+		else {
+			console.log("f")
+			if (activeTower === key - 1) {
+				setActiveTower(null);
+			}
+			else if (!availableTowers.includes(key - 1)) return;
+			else {
+				moveBlock(key - 1);
+			}
+		}
+	}, [availableTowers, activeTower]);
+
+	useEffect(() => {
+		document.addEventListener("keydown", handleKeyPress);
+
+		return () => document.removeEventListener("keydown", handleKeyPress);
+	}, [handleKeyPress]);
 
   	return (
 		<div className="App">
