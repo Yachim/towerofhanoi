@@ -21,4 +21,14 @@
 	display: flex;
 	justify-content: space-between;
 	gap: 3.5rem;
+
+	&--won {
+		justify-content: center;
+		align-items: center;
+	}
+}
+
+.gg-text {
+	font-size: 10rem;
+	font-weight: bold;
 }

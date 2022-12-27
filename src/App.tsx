@@ -8,6 +8,7 @@ const defaultBlocksCnt = 3;
 const maxBlocksCnt = 20;
 const minBlocksCnt = 3;
 export const BlocksCntContext = createContext(defaultBlocksCnt);
+export const WonContext = createContext(false);
 
 function App() {
 	const [blocksCnt, setBlocksCnt] = useState(defaultBlocksCnt);
@@ -71,6 +72,10 @@ function App() {
 				pos: 2
 			}
 		]);
+
+		setActiveTower(null);
+		setAvailableTowers([]);
+		setIsWon(false);
 	}
 
 	const [activeTower, setActiveTower] = useState<number | null>(null);
@@ -107,8 +112,16 @@ function App() {
 
 	const [moveCnt, setMoveCnt] = useState(0);
 
+	const [isWon, setIsWon] = useState(false);
+
+	function checkWon() {
+		if (towers[0].blocks.length > 0) return;
+		if (towers[1].blocks.length > 0) return;
+
+		setIsWon(true);
+	}
+
 	function moveBlock(targetIndex: number) {
-		console.log("fff");
 		const tower = towers[activeTower!];
 		const targetTower = towers[targetIndex];
 
@@ -123,6 +136,7 @@ function App() {
 		setTowers(towers);
 		setMoveCnt((prev) => prev + 1);
 		setActiveTower(null);
+		checkWon();
 	}
 
   	return (
@@ -153,21 +167,28 @@ function App() {
 			</div>
 
 			<BlocksCntContext.Provider value={blocksCnt}>
-				<main className={style["game-area"]}>
-					{towers.map((tower, i) => (
-						<Tower 
-							key={i}
-							{...tower} 
-							available={availableTowers.includes(i)} 
-							selected={activeTower === i}
-							setSelected={setActiveTower}
-							noneSelected={activeTower === null}
-							moveBlockHere={() => {
-								moveBlock(i);
-							}}
-						/>
-					))}
-				</main>
+				<WonContext.Provider value={isWon}>
+					<main className={`
+						${style["game-area"]}
+						${isWon ? style["game-area--won"] : ""}
+					`}>
+						{!isWon ? towers.map((tower, i) => (
+							<Tower 
+								key={i}
+								{...tower} 
+								available={availableTowers.includes(i)} 
+								selected={activeTower === i}
+								setSelected={setActiveTower}
+								noneSelected={activeTower === null}
+								moveBlockHere={() => {
+									moveBlock(i);
+								}}
+							/>
+						)) :
+							<p className={style["gg-text"]}>GG!</p>
+						}
+					</main>
+				</WonContext.Provider>
 			</BlocksCntContext.Provider>
     	</div>
   	);

@@ -1,7 +1,8 @@
 import { Tower as TowerProps } from "../types";
 import { Block } from ".";
 import style from "../style/Tower.module.scss";
-import { Dispatch, SetStateAction, useMemo } from "react";
+import { Dispatch, SetStateAction, useContext, useMemo } from "react";
+import { WonContext } from "../App";
 
 export default function Tower(props: TowerProps & {
 	available: boolean;
@@ -10,6 +11,8 @@ export default function Tower(props: TowerProps & {
 	moveBlockHere: () => void;
 	noneSelected: boolean;
 }) {
+	const won = useContext(WonContext);
+
 	return (
 		<div 
 			className={`
@@ -21,6 +24,9 @@ export default function Tower(props: TowerProps & {
 				}
 			`}
 			onClick={() => {
+				// do not allow if game is won
+				if (won) return;
+
 				// if clicked second time => deselect
 				if (props.selected) {
 					props.setSelected(null);
