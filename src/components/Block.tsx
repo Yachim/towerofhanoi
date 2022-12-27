@@ -37,6 +37,6 @@ export default function Block(props: BlockProps & {
 				"--height": `${height}px`,
 				"--width": `${width}%`
 			} as CSSProperties}
-		></div>
+		>{props.size}</div>
 	);
 }

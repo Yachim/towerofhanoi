@@ -5,7 +5,7 @@ import "./style/App.global.scss";
 import style from "./style/App.module.scss";;
 
 const defaultBlocksCnt = 3;
-const maxBlocksCnt = 20;
+const maxBlocksCnt = 10;
 const minBlocksCnt = 3;
 export const BlocksCntContext = createContext(defaultBlocksCnt);
 export const WonContext = createContext(false);
