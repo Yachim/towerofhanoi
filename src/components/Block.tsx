@@ -1,5 +1,5 @@
 import { CSSProperties, useContext, useMemo } from "react";
-import { BlocksCntContext } from "../App";
+import { BlocksCntContext, ShowNumberContext } from "../App";
 import { Block as BlockProps } from "../types";
 import style from "../style/Block.module.scss";
 
@@ -11,6 +11,7 @@ export default function Block(props: BlockProps & {
 	containerHeight: number;
 }) {
 	const blocksCnt = useContext(BlocksCntContext);
+	const showNumbers = useContext(ShowNumberContext);
 
 	const hue = useMemo(() => (
 		(360 / blocksCnt) * props.size
@@ -37,6 +38,6 @@ export default function Block(props: BlockProps & {
 				"--height": `${height}px`,
 				"--width": `${width}%`
 			} as CSSProperties}
-		>{props.size}</div>
+		>{showNumbers && props.size}</div>
 	);
 }

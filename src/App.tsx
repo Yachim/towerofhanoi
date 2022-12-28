@@ -9,6 +9,7 @@ const maxBlocksCnt = 10;
 const minBlocksCnt = 3;
 export const BlocksCntContext = createContext(defaultBlocksCnt);
 export const WonContext = createContext(false);
+export const ShowNumberContext = createContext(true);
 
 function App() {
 	const [blocksCnt, setBlocksCnt] = useState(defaultBlocksCnt);
@@ -177,25 +178,65 @@ function App() {
 		return () => document.removeEventListener("keydown", handleKeyPress);
 	}, [handleKeyPress]);
 
+	const [showNumbers, setShowNumbers] = useState(true);
+
   	return (
 		<div className="App">
-			<div className={style["inputs-wrapper"]}>
+			<div className={style.inputs}>
+				<label htmlFor="tower-cnt">Number of blocks:</label>
+				<input 
+					id="tower-cnt"
+					type="number" 
+					ref={cntEl} 
+					defaultValue={defaultBlocksCnt}
+					min={minBlocksCnt}
+					max={maxBlocksCnt}
+				/>
+				<button onClick={applyAndRestart}>Apply and restart</button>
+				<button onClick={restart}>Restart</button>
+				<button>Hint</button>
+				<button>Undo</button>
+				<button>Redo</button>
+				<button>Solve</button>
+			</div>
+
+			<ShowNumberContext.Provider value={showNumbers}>
+				<BlocksCntContext.Provider value={blocksCnt}>
+					<WonContext.Provider value={isWon}>
+						<main className={`
+							${style["game-area"]}
+							${isWon ? style["game-area--won"] : ""}
+						`}>
+							{towers.map((tower, i) => (
+								<Tower 
+									key={i}
+									{...tower} 
+									available={availableTowers.includes(i)} 
+									selected={activeTower === i}
+									setSelected={setActiveTower}
+									noneSelected={activeTower === null}
+									moveBlockHere={() => {
+										moveBlock(i);
+									}}
+								/>
+							))}
+						</main>
+						{isWon && 
+							<p className={style["gg-text"]}>GG!</p>
+						}
+					</WonContext.Provider>
+				</BlocksCntContext.Provider>
+			</ShowNumberContext.Provider>
+
+			<div className={style["bottom-wrapper"]}>
 				<div className={style.inputs}>
-					<label htmlFor="tower-cnt">Number of blocks:</label>
+					<label htmlFor="show-numbers">Show numbers</label>
 					<input 
-						id="tower-cnt"
-						type="number" 
-						ref={cntEl} 
-						defaultValue={defaultBlocksCnt}
-						min={minBlocksCnt}
-						max={maxBlocksCnt}
+						id="show-numbers" 
+						type="checkbox" 
+						checked={showNumbers}
+						onChange={() => setShowNumbers(prev => !prev)}
 					/>
-					<button onClick={applyAndRestart}>Apply and restart</button>
-					<button onClick={restart}>Restart</button>
-					<button>Hint</button>
-					<button>Undo</button>
-					<button>Redo</button>
-					<button>Solve</button>
 				</div>
 
 				<div className={style.inputs}>
@@ -203,32 +244,6 @@ function App() {
 					<button>Show all</button>
 				</div>
 			</div>
-
-			<BlocksCntContext.Provider value={blocksCnt}>
-				<WonContext.Provider value={isWon}>
-					<main className={`
-						${style["game-area"]}
-						${isWon ? style["game-area--won"] : ""}
-					`}>
-						{towers.map((tower, i) => (
-							<Tower 
-								key={i}
-								{...tower} 
-								available={availableTowers.includes(i)} 
-								selected={activeTower === i}
-								setSelected={setActiveTower}
-								noneSelected={activeTower === null}
-								moveBlockHere={() => {
-									moveBlock(i);
-								}}
-							/>
-						))}
-					</main>
-					{isWon && 
-						<p className={style["gg-text"]}>GG!</p>
-					}
-				</WonContext.Provider>
-			</BlocksCntContext.Provider>
     	</div>
   	);
 }
