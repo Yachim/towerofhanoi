@@ -11,28 +11,28 @@ export const BlocksCntContext = createContext(defaultBlocksCnt);
 export const WonContext = createContext(false);
 export const ShowNumberContext = createContext(true);
 
+const defaultTowers: [TowerProps, TowerProps, TowerProps] = [
+	{
+		blocks: [
+			{size: 1},
+			{size: 2},
+			{size: 3}
+		],
+		pos: 0
+	},
+	{
+		blocks: [],
+		pos: 1
+	},
+	{
+		blocks: [],
+		pos: 2
+	}
+];
+
 function App() {
 	const [blocksCnt, setBlocksCnt] = useState(defaultBlocksCnt);
 	const cntEl = useRef<HTMLInputElement>(null);
-
-	const [towers, setTowers] = useState<TowerProps[]>([
-		{
-			blocks: [
-				{size: 1},
-				{size: 2},
-				{size: 3}
-			],
-			pos: 0
-		},
-		{
-			blocks: [],
-			pos: 1
-		},
-		{
-			blocks: [],
-			pos: 2
-		}
-	]);
 
 	function applyAndRestart() {
 		if (!cntEl.current) return;
@@ -59,7 +59,7 @@ function App() {
 			});
 		}
 
-		setTowers([
+		setMoves([[
 			{
 				blocks: blocks,
 				pos: 0
@@ -72,15 +72,17 @@ function App() {
 				blocks: [],
 				pos: 2
 			}
-		]);
+		]]);
 
 		setActiveTower(null);
 		setAvailableTowers([]);
 		setIsWon(false);
 		setMoveCnt(0);
+		setCurrentMove(0);
 	}
 
 	const [activeTower, setActiveTower] = useState<number | null>(null);
+	
 	const [availableTowers, setAvailableTowers] = useState<number[]>([]);
 
 	useEffect(() => {
@@ -94,13 +96,13 @@ function App() {
 		// remove active tower
 		available.splice(activeTower, 1);
 
-		available = available.filter((availableIndex, i) => {
-			const tower = towers[availableIndex];
+		available = available.filter((availableIndex) => {
+			const tower = moves[currentMove][availableIndex];
 			
 			// if tower does not contain blocks => skip
 			if (tower.blocks.length === 0) return true;
 
-			const activeTowerTopBlockSize = towers[activeTower].blocks[0].size;
+			const activeTowerTopBlockSize = moves[currentMove][activeTower].blocks[0].size;
 			const towerTopBlockSize = tower.blocks[0].size;
 			// if tower's top block's size is bigger than active's top block's size => valid => skip
 			if (towerTopBlockSize > activeTowerTopBlockSize) return true;
@@ -116,14 +118,20 @@ function App() {
 
 	const [isWon, setIsWon] = useState(false);
 
-	function checkWon() {
-		if (towers[0].blocks.length > 0) return;
-		if (towers[1].blocks.length > 0) return;
+	const [moves, setMoves] = useState<[TowerProps, TowerProps, TowerProps][]>([defaultTowers]);
+	const [currentMove, setCurrentMove] = useState(0);
+
+	useEffect(() => {
+		if (moves[currentMove][0].blocks.length > 0) return;
+		if (moves[currentMove][1].blocks.length > 0) return;
 
 		setIsWon(true);
-	}
+	}, [moves, currentMove]);
 
 	function moveBlock(targetIndex: number) {
+		// deep clone
+		const towers: [TowerProps, TowerProps, TowerProps] = JSON.parse(JSON.stringify(moves[currentMove]));
+
 		const tower = towers[activeTower!];
 		const targetTower = towers[targetIndex];
 
@@ -135,10 +143,13 @@ function App() {
 			...targetTower.blocks
 		];
 
-		setTowers(towers);
 		setMoveCnt((prev) => prev + 1);
 		setActiveTower(null);
-		checkWon();
+		setMoves((prev) => [
+			...prev.slice(0, currentMove + 1),
+			towers
+		]);
+		setCurrentMove((prev) => prev + 1);
 	}
 
 	const minimumMoves = useMemo(() => {
@@ -153,24 +164,30 @@ function App() {
 	const handleKeyPress = useCallback((e: KeyboardEvent) => {
 		if (isWon) return;
 
+		if (["u", "e", "U", "E"].includes(e.key)) {
+			if (["u", "U"].includes(e.key)) undo();
+			else if (["e", "E"].includes(e.key)) redo();
+
+			return;
+		};
+
 		if (!["1", "2", "3"].includes(e.key)) return;
-		const key = +e.key;
+		const key = +e.key - 1;
 
 		if (activeTower === null) {
-			if (towers[key - 1].blocks.length === 0) return;
-			setActiveTower(key - 1);
+			if (moves[currentMove][key].blocks.length === 0) return;
+			setActiveTower(key);
 		}
 		else {
-			console.log("f")
-			if (activeTower === key - 1) {
+			if (activeTower === key) {
 				setActiveTower(null);
 			}
-			else if (!availableTowers.includes(key - 1)) return;
+			else if (!availableTowers.includes(key)) return;
 			else {
-				moveBlock(key - 1);
+				moveBlock(key);
 			}
-		}
-	}, [availableTowers, activeTower]);
+		}	
+	}, [availableTowers, activeTower, moves, currentMove]);
 
 	useEffect(() => {
 		document.addEventListener("keydown", handleKeyPress);
@@ -179,6 +196,21 @@ function App() {
 	}, [handleKeyPress]);
 
 	const [showNumbers, setShowNumbers] = useState(true);
+
+	function undo() {
+		if (currentMove === 0) return;
+		if (isWon) setIsWon(false);
+		setActiveTower(null);
+
+		setCurrentMove((prev) => prev - 1);
+	}
+
+	function redo() {
+		if (currentMove === moves.length - 1 || isWon) return;
+		setActiveTower(null);
+
+		setCurrentMove((prev) => prev + 1);
+	}
 
   	return (
 		<div className="App">
@@ -194,10 +226,8 @@ function App() {
 				/>
 				<button onClick={applyAndRestart}>Apply and restart</button>
 				<button onClick={restart}>Restart</button>
-				<button>Hint</button>
-				<button>Undo</button>
-				<button>Redo</button>
-				<button>Solve</button>
+				<button onClick={undo}>Undo</button>
+				<button onClick={redo}>Redo</button>
 			</div>
 
 			<ShowNumberContext.Provider value={showNumbers}>
@@ -207,7 +237,7 @@ function App() {
 							${style["game-area"]}
 							${isWon ? style["game-area--won"] : ""}
 						`}>
-							{towers.map((tower, i) => (
+							{moves[currentMove].map((tower, i) => (
 								<Tower 
 									key={i}
 									{...tower} 
@@ -240,7 +270,7 @@ function App() {
 				</div>
 
 				<div className={style.inputs}>
-					<p>Moves: {moveCnt} (minumum: {minimumMoves})</p>
+					<p>Moves: {currentMove}/{moveCnt} (minumum: {minimumMoves})</p>
 					<button>Show all</button>
 				</div>
 			</div>
