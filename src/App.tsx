@@ -96,7 +96,7 @@ function App() {
 		// remove active tower
 		available.splice(activeTower, 1);
 
-		available = available.filter((availableIndex, i) => {
+		available = available.filter((availableIndex) => {
 			const tower = moves[currentMove][availableIndex];
 			
 			// if tower does not contain blocks => skip
@@ -228,7 +228,6 @@ function App() {
 				<button onClick={restart}>Restart</button>
 				<button onClick={undo}>Undo</button>
 				<button onClick={redo}>Redo</button>
-				<button>Solve</button>
 			</div>
 
 			<ShowNumberContext.Provider value={showNumbers}>
