@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Tower } from './components';
+import { MovesList, Tower } from './components';
 import { Tower as TowerProps } from './types';
 import "./style/App.global.scss";
 import style from "./style/App.module.scss";;
@@ -11,12 +11,15 @@ export const BlocksCntContext = createContext(defaultBlocksCnt);
 export const WonContext = createContext(false);
 export const ShowNumberContext = createContext(true);
 
-const defaultTowers: [TowerProps, TowerProps, TowerProps] = [
+export type Move = [TowerProps, TowerProps, TowerProps];
+export type Moves = Move[];
+
+const defaultTowers: Move = [
 	{
 		blocks: [
-			{size: 1},
-			{size: 2},
-			{size: 3}
+			{ size: 1 },
+			{ size: 2 },
+			{ size: 3 }
 		],
 		pos: 0
 	},
@@ -82,7 +85,7 @@ function App() {
 	}
 
 	const [activeTower, setActiveTower] = useState<number | null>(null);
-	
+
 	const [availableTowers, setAvailableTowers] = useState<number[]>([]);
 
 	useEffect(() => {
@@ -98,7 +101,7 @@ function App() {
 
 		available = available.filter((availableIndex) => {
 			const tower = moves[currentMove][availableIndex];
-			
+
 			// if tower does not contain blocks => skip
 			if (tower.blocks.length === 0) return true;
 
@@ -118,7 +121,7 @@ function App() {
 
 	const [isWon, setIsWon] = useState(false);
 
-	const [moves, setMoves] = useState<[TowerProps, TowerProps, TowerProps][]>([defaultTowers]);
+	const [moves, setMoves] = useState<Moves>([defaultTowers]);
 	const [currentMove, setCurrentMove] = useState(0);
 
 	useEffect(() => {
@@ -130,7 +133,7 @@ function App() {
 
 	function moveBlock(targetIndex: number) {
 		// deep clone
-		const towers: [TowerProps, TowerProps, TowerProps] = JSON.parse(JSON.stringify(moves[currentMove]));
+		const towers: Move = JSON.parse(JSON.stringify(moves[currentMove]));
 
 		const tower = towers[activeTower!];
 		const targetTower = towers[targetIndex];
@@ -186,7 +189,7 @@ function App() {
 			else {
 				moveBlock(key);
 			}
-		}	
+		}
 	}, [availableTowers, activeTower, moves, currentMove]);
 
 	useEffect(() => {
@@ -212,14 +215,16 @@ function App() {
 		setCurrentMove((prev) => prev + 1);
 	}
 
-  	return (
+	const [movesShown, setMovesShown] = useState(false);
+
+	return (
 		<div className="App">
 			<div className={style.inputs}>
 				<label htmlFor="tower-cnt">Number of blocks:</label>
-				<input 
+				<input
 					id="tower-cnt"
-					type="number" 
-					ref={cntEl} 
+					type="number"
+					ref={cntEl}
 					defaultValue={defaultBlocksCnt}
 					min={minBlocksCnt}
 					max={maxBlocksCnt}
@@ -233,15 +238,12 @@ function App() {
 			<ShowNumberContext.Provider value={showNumbers}>
 				<BlocksCntContext.Provider value={blocksCnt}>
 					<WonContext.Provider value={isWon}>
-						<main className={`
-							${style["game-area"]}
-							${isWon ? style["game-area--won"] : ""}
-						`}>
+						<main className={style["game-area"]}>
 							{moves[currentMove].map((tower, i) => (
-								<Tower 
+								<Tower
 									key={i}
-									{...tower} 
-									available={availableTowers.includes(i)} 
+									{...tower}
+									available={availableTowers.includes(i)}
 									selected={activeTower === i}
 									setSelected={setActiveTower}
 									noneSelected={activeTower === null}
@@ -250,10 +252,11 @@ function App() {
 									}}
 								/>
 							))}
+							<MovesList moves={moves} closeFunc={setMovesShown} shown={movesShown} />
+							{isWon &&
+								<p className={style["gg-text"]}>GG!</p>
+							}
 						</main>
-						{isWon && 
-							<p className={style["gg-text"]}>GG!</p>
-						}
 					</WonContext.Provider>
 				</BlocksCntContext.Provider>
 			</ShowNumberContext.Provider>
@@ -261,9 +264,9 @@ function App() {
 			<div className={style["bottom-wrapper"]}>
 				<div className={style.inputs}>
 					<label htmlFor="show-numbers">Show numbers</label>
-					<input 
-						id="show-numbers" 
-						type="checkbox" 
+					<input
+						id="show-numbers"
+						type="checkbox"
 						checked={showNumbers}
 						onChange={() => setShowNumbers(prev => !prev)}
 					/>
@@ -271,11 +274,11 @@ function App() {
 
 				<div className={style.inputs}>
 					<p>Moves: {currentMove}/{moveCnt} (minumum: {minimumMoves})</p>
-					<button>Show all</button>
+					<button onClick={() => setMovesShown(prev => !prev)}>Show all</button>
 				</div>
 			</div>
-    	</div>
-  	);
+		</div>
+	);
 }
 
 export default App
